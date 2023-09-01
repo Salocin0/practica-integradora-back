@@ -26,8 +26,8 @@ class ModelProduct {
     return userUptaded;
   }
 
-  async deleteProduct(id) {
-    const deleted = await ProductsModel.deleteOne({ _id: id });
+  async deleteProduct(id,user) {
+    const deleted = await ProductsModel.deleteOne({ _id: id },{owner:user});
     return deleted;
   }
 }

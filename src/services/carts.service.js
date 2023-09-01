@@ -5,7 +5,7 @@ import importModels from '../DAO/factory.js';
 const models = await importModels();
 const modelProduct = models.products;
 const modelCart = models.carts;
-const ticketsModel= models.tickets;
+const ticketsModel = models.tickets;
 
 class CartService {
   validateId(id) {
@@ -65,7 +65,7 @@ class CartService {
   }
 
   async updateCart(id, products) {
-    if(!id || !products){
+    if (!id || !products) {
       return null;
     }
     const cartCreated = await modelCart.updateCart(id, products);
@@ -88,30 +88,29 @@ class CartService {
     return deleted;
   }
 
-  async addProductToCart(cid, pid) {
+  async addProductToCart(cid, pid, email) {
     this.validateId(cid);
     this.validateProduct(pid);
+    const product = await modelProduct.getProduct(pid);
     const cart = await this.getCart(cid);
-    let existingProduct = cart.products.find(p => p.id._id.toString() === pid.toString());
-    
-    if (existingProduct) {
+    let existingProduct = cart.products.find((p) => p.id._id.toString() === pid.toString());
+    if (!product.owner == email) {
+      if (existingProduct) {
         existingProduct.quantity += 1;
-    } else {
+      } else {
         let newProduct = {
-            id: pid.toString(),
-            quantity: 1,
+          id: pid.toString(),
+          quantity: 1,
         };
         cart.products.push(newProduct);
+      }
     }
-
     const updatedCart = await this.updateCart(cid, cart.products);
-
     return updatedCart;
-}
-
+  }
 
   async deleteProductInCart(cid, pid) {
-    if(this.validateProductInCart(cid, pid)){
+    if (this.validateProductInCart(cid, pid)) {
       return null;
     }
     const cart = await this.getCart(cid);
@@ -127,15 +126,15 @@ class CartService {
   }
 
   async purchaseCart(id, email) {
-    if(!id||!email){
+    if (!id || !email) {
       return null;
     }
     const ticket = {
-        code: Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000,
-        purchase_datetime: new Date(),
-        amount: 0,
-        purchaser: email,
-        products: [],
+      code: Math.floor(Math.random() * (9999 - 1000 + 1)) + 1000,
+      purchase_datetime: new Date(),
+      amount: 0,
+      purchaser: email,
+      products: [],
     };
 
     const cart = await this.getCart(id);
@@ -143,51 +142,51 @@ class CartService {
     const updatedProducts = [];
 
     for (const product of cart.products) {
-        const productdb = await modelProduct.getProduct(product.id._id);
+      const productdb = await modelProduct.getProduct(product.id._id);
 
-        if (productdb.stock >= product.quantity) {
-            productdb.stock -= product.quantity;
-            //total
-            await modelProduct.updateProduct(
-                productdb._id,
-                productdb.title,
-                productdb.description,
-                productdb.code,
-                productdb.price,
-                productdb.status,
-                productdb.stock,
-                productdb.category,
-                productdb.thumbnails
-            );
-            updatedProducts.push(productdb);
-        } else {
-            product.quantity -= productdb.stock;
-            ticket.amount += productdb.price * productdb.stock;
-            productdb.stock = 0;
-            await modelProduct.updateProduct(
-                productdb._id,
-                productdb.title,
-                productdb.description,
-                productdb.code,
-                productdb.price,
-                productdb.status,
-                productdb.stock,
-                productdb.category,
-                productdb.thumbnails
-            );
-            const index = cart.products.findIndex(p => p.id._id === product.id._id);
-            if (index !== -1) {
-                cart.products[index].quantity = product.quantity;
-            }
+      if (productdb.stock >= product.quantity) {
+        productdb.stock -= product.quantity;
+        //total
+        await modelProduct.updateProduct(
+          productdb._id,
+          productdb.title,
+          productdb.description,
+          productdb.code,
+          productdb.price,
+          productdb.status,
+          productdb.stock,
+          productdb.category,
+          productdb.thumbnails
+        );
+        updatedProducts.push(productdb);
+      } else {
+        product.quantity -= productdb.stock;
+        ticket.amount += productdb.price * productdb.stock;
+        productdb.stock = 0;
+        await modelProduct.updateProduct(
+          productdb._id,
+          productdb.title,
+          productdb.description,
+          productdb.code,
+          productdb.price,
+          productdb.status,
+          productdb.stock,
+          productdb.category,
+          productdb.thumbnails
+        );
+        const index = cart.products.findIndex((p) => p.id._id === product.id._id);
+        if (index !== -1) {
+          cart.products[index].quantity = product.quantity;
         }
+      }
     }
 
-    cart.products = cart.products.filter(p => !updatedProducts.some(updatedProduct => updatedProduct._id.toString() === p.id._id.toString()));
+    cart.products = cart.products.filter((p) => !updatedProducts.some((updatedProduct) => updatedProduct._id.toString() === p.id._id.toString()));
 
     if (cart.products.length === 0) {
-        await this.deleteCart(id);
+      await this.deleteCart(id);
     } else {
-        await this.updateCart(id, cart.products);
+      await this.updateCart(id, cart.products);
     }
 
     await ticketsModel.create(ticket);
@@ -195,9 +194,7 @@ class CartService {
     // Mandar el email aquí
 
     return ticket;
-}
-
-
+  }
 }
 
 export const cartService = new CartService();

@@ -209,8 +209,9 @@ class CartController {
 
   async addProductoToCart(req, res) {
     try {
+      const email = req.user.email;
       const { cid, pid } = req.params;
-      const cartUptaded = await cartService.addProductToCart(cid, pid);
+      const cartUptaded = await cartService.addProductToCart(cid, pid, email);
       if (typeof cart !== {}) {
         return res.status(200).json({
           status: 'sucess',

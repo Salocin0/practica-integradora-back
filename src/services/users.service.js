@@ -65,6 +65,18 @@ class UserService {
     const deleted = await modelUsuario.deleteUser(id);
     return deleted;
   }
+
+  async changerol(id) {
+    const user = await this.getOneUser(id);
+    if(user.rol=="premium"){
+      user.rol="user"
+      user.save()
+    }else if(user.rol=="user"){
+      user.rol="premium"
+      user.save()
+    }
+    return user;
+  }
 }
 
 export const userService = new UserService();

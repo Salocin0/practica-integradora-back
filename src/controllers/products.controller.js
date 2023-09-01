@@ -131,8 +131,9 @@ class ProductControler {
 
   async delete(req, res) {
     try {
+      const user = req.user.rol;
       const { id } = req.params;
-      const deleted = await productService.deleteProduct(id);
+      const deleted = await productService.deleteProduct(id,user);
       return res.status(200).json({
         status: 'success',
         msg: 'product deleted',

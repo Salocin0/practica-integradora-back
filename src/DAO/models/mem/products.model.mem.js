@@ -61,7 +61,7 @@ class ModelProduct {
     return product;
   }
 
-  async deleteProduct(id) {
+  async deleteProduct(id,user) {
     const deleted = this.products.filter(u => u.id !== id);
     return deleted;
   }

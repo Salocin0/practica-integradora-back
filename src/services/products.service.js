@@ -92,9 +92,9 @@ class ProductService {
     return userUptaded;
   }
 
-  async deleteProduct(id) {
+  async deleteProduct(id,user) {
     this.validateId(id);
-    const deleted = await modelProduct.deleteProduct(id);
+    const deleted = await modelProduct.deleteProduct(id,user);
     return deleted;
   }
 
