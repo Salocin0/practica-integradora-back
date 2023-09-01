@@ -1,6 +1,7 @@
 import importModels from '../DAO/factory.js';
 const models = await importModels();
 const modelProduct = models.products;
+import { UserModel } from '../DAO/models/mongoose/users.model.js';
 
 class ProductService {
   validatePostProduct(title, description, code, price, status, stock, category, thumbnails) {
@@ -64,7 +65,11 @@ class ProductService {
     return product;
   }
 
-  async createProduct(title, description, code, price, status, stock, category, thumbnails) {
+  async createProduct(title, description, code, price, status, stock, category, thumbnails,owner) {
+    const User = await UserModel.findOne({ email: owner });
+    if(!User){
+      owner="admin"
+    }
     const products = await modelProduct.getAllProducts();
     const productcreated = null;
     let existcode = products.docs.find((p) => p.code === code);
@@ -76,7 +81,7 @@ class ProductService {
       });
     } else {
       this.validatePostProduct(title, description, code, price, status, stock, category, thumbnails);
-      productcreated = await modelProduct.createProduct(title, description, code, price, status, stock, category, thumbnails);
+      productcreated = await modelProduct.createProduct(title, description, code, price, status, stock, category, thumbnails,owner);
       return productcreated;
     }
   }

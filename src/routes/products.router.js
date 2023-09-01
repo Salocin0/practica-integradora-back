@@ -1,5 +1,5 @@
 import express from "express";
-import { isAmdin } from "../middlewares/auth.js";
+import { isAmdin,checkPremiumAdmin } from "../middlewares/auth.js";
 import { productControler } from "../controllers/products.controller.js";
 export const routerProductos = express.Router();
 
@@ -13,5 +13,5 @@ routerProductos.delete("/:id", isAmdin, productControler.delete);
 
 routerProductos.put("/:id", isAmdin, productControler.update);
 
-routerProductos.post("/", isAmdin, productControler.create);
+routerProductos.post("/", checkPremiumAdmin, productControler.create);
 

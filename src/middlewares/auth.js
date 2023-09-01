@@ -17,6 +17,13 @@ export function isUser(req, res, next) {
   return res.status(401).render('error-page', { msg: 'please log in!' });
 }
 
+export function isPremium(req, res, next) {
+  if (req.session.email) {
+    return next();
+  }
+  return res.status(401).render('error-page', { msg: 'please log in as premium!' });
+}
+
 export function isUserNotAdmin(req, res, next) { //falta asignarlo al chat
   if (req.session.email && req.session.admin == false) {
     return next();
@@ -45,7 +52,7 @@ export function checkLogin(req, res, next) {
 }
 
 export function checkAdmin(req, res, next) {
-  if (req.session?.user?.role == 'admin') {
+  if (req.session?.user?.rol == 'admin') {
     return next();
   } else {
     const isAdmin = 'Debes ser administrador para acceder a esta página';
@@ -54,12 +61,32 @@ export function checkAdmin(req, res, next) {
 }
 
 export function checkUser(req, res, next) {
-  if (req.session?.user?.role == 'user') {
+  if (req.session?.user?.rol == 'user') {
     return next();
   } else {
     logger.error('Debes ser usuario para realizar esta acción.');
     const isUser = 'Debes ser usuario para realizar esta acción.';
     return res.status(201).render('error', { isUser });
+  }
+}
+
+export function checkPremium(req, res, next) {
+  if (req.session?.user?.rol == 'premium') {
+    return next();
+  } else {
+    logger.error('Debes ser premium para realizar esta acción.');
+    const isUser = 'Debes ser premium para realizar esta acción.';
+    return res.status(201).render('error', { isPremium });
+  }
+}
+
+export function checkPremiumAdmin(req, res, next) {
+  if (req.session?.user?.rol == 'premium' || req.session?.user?.rol == 'admin') {
+    return next();
+  } else {
+    logger.error('Debes ser premium para realizar esta acción.');
+    const isUser = 'Debes ser premium para realizar esta acción.';
+    return res.status(201).render('error', { isPremium });
   }
 }
 

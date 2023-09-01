@@ -16,8 +16,8 @@ class ModelProduct {
     return product;
   }
 
-  async createProduct(title, description, code, price, status, stock, category, thumbnails) {
-    const productcreated = await ProductsModel.create({ title, description, code, price, status, stock, category, thumbnails });
+  async createProduct(title, description, code, price, status, stock, category, thumbnails,owner="admin") {
+    const productcreated = await ProductsModel.create({ title, description, code, price, status, stock, category, thumbnails,owner });
     return productcreated;
   }
 
