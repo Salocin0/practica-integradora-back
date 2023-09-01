@@ -1,8 +1,8 @@
 import { RecoverTokensMongoose } from '../DAO/models/mongoose/recover-codes.js';
 import { UserModel } from '../DAO/models/mongoose/users.model.js';
-import { createHash } from '../utils/bcrypt.js';
+import { createHash,isValidPassword } from '../utils/bcrypt.js';
 import { randomBytes } from 'crypto';
-import transport from '../utils/nodemailer.js'
+import transport from '../utils/nodemailer.js';
 import enviromentConfig from '../config/enviroment.config.js';
 
 class RecoverService {
@@ -14,9 +14,14 @@ class RecoverService {
   async recoverpassPost(token, email, password) {
     const foundToken = await this.getRecoverToken(token, email);
     if (foundToken && foundToken.expire > Date.now() && password) {
-      password = createHash(password);
-      const updatedUser = await UserModel.updateOne({ email }, { password });
-      return updatedUser;
+      const User = await UserModel.findOne({ email }, { password });
+      if(isValidPassword(password,User.password)){
+        throw new Error('password is the same');
+      }else{
+        password = createHash(password);
+        const updatedUser = await UserModel.updateOne({ email }, { password });
+        return updatedUser;
+      }
     } else {
       return null;
     }
@@ -42,7 +47,7 @@ class RecoverService {
     }
     const user = await UserModel.findOne({ email });
     if (!user) {
-        throw new Error('Invalid email');
+      throw new Error('Invalid email');
     }
     const token = randomBytes(20).toString('hex');
     const expire = Date.now() + 3600000;
