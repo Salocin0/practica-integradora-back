@@ -118,8 +118,8 @@ class UserController {
 
   async changerol(req, res) {
     try {
-      const { id } = req.user.id;
-      const changed = await userService.changerol(id);
+      const { uid } = req.params;
+      const changed = await userService.changerol(uid);
       if(changed){
         return res.status(200).json({
           status: 'success',
@@ -128,6 +128,7 @@ class UserController {
         });
       }
     } catch (e) {
+      console.log(e)
       CustomError.createError({
         name: 'Error Del Servidor',
         cause: 'Ocurrió un error inesperado en el servidor. La operación no pudo completarse.',

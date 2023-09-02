@@ -7,7 +7,7 @@ class ModelUsuario {
   }
 
   async getOneUser(id) {
-    const user = await UserModel.find({_id:id});
+    const user = await UserModel.findOne({_id:id});
     return user;
   }
 
@@ -16,8 +16,8 @@ class ModelUsuario {
     return userCreated;
   }
   
-  async updateUser(id, firstName, lastName, email) {
-    const userUptaded = await UserModel.updateOne({ _id: id }, { firstName, lastName, email });
+  async updateUser(id, firstName, lastName, email, rol) {
+    const userUptaded = await UserModel.updateOne({ _id: id }, { firstName, lastName, email, rol });
     return userUptaded;
   }
 

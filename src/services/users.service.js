@@ -54,9 +54,9 @@ class UserService {
     return userCreated;
   }
 
-  async updateUser(id, firstName, lastName, email) {
-    this.validatePostUser(id, firstName, lastName, email);
-    const userUptaded = await modelUsuario.updateUser(id, firstName, lastName, email);
+  async updateUser(id, firstName, lastName, email, rol) {
+    //this.validatePostUser(id, firstName, lastName, email);
+    const userUptaded = await modelUsuario.updateUser(id, firstName, lastName, email, rol);
     return userUptaded;
   }
 
@@ -67,15 +67,18 @@ class UserService {
   }
 
   async changerol(id) {
-    const user = await this.getOneUser(id);
-    if(user.rol=="premium"){
-      user.rol="user"
-      user.save()
-    }else if(user.rol=="user"){
-      user.rol="premium"
-      user.save()
+    let userdb = await this.getOneUser(id);
+    console.log(userdb)
+    if (userdb.rol === "premium") {
+      userdb.rol = "user";
+    } else if (userdb.rol === "user") {
+      userdb.rol = "premium";
+    }else{
+      userdb.rol="user"
     }
-    return user;
+    console.log(userdb)
+    userdb = await this.updateUser(id, userdb.firstName, userdb.lastName, userdb.email, userdb.rol);
+    return userdb;
   }
 }
 
